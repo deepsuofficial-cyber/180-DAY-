@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>180 Day Challenge</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#060907;color:#fff;font-family:Arial,sans-serif}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(#0005,#000c),radial-gradient(circle at 50% 0,#39483d,#111713 45%,#050605)}
+.app{max-width:720px;margin:auto;padding-bottom:80px}.top{text-align:center;padding:28px 15px 10px}
+.welcome{font-size:15px;letter-spacing:4px;color:#c5cec8;font-weight:900}.top h1{font-size:34px;margin:10px 0}
+.page{display:none}.page.active{display:block}.card{margin:14px;padding:18px;border:1px solid #354138;border-radius:20px;background:#0b100de8}
+.big{text-align:center;font-size:21px;font-weight:900}.green{color:#c8ef59}.labels{display:flex;justify-content:space-between;color:#9ca79f;font-size:11px;font-weight:900;margin:14px 0 6px}.bar{height:28px;padding:4px;background:#111;border:1px solid #465148;border-radius:20px}.fill{height:100%;width:0;background:linear-gradient(90deg,#70b51d,#dcf45c);border-radius:15px;transition:.4s}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{text-align:center;padding:13px;background:#0d1510;border:1px solid #344138;border-radius:14px}.stat b{display:block;font-size:25px;color:#c8ef59}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:#080b09f5;border-top:1px solid #354138;display:flex;justify-content:center}nav button{width:25%;max-width:180px;padding:12px 3px;border:0;background:none;color:#849088;font-weight:900;font-size:11px}nav button.active{color:#c8ef59}
+h2{margin:0 0 14px}.days{display:flex;gap:6px;overflow:auto;padding-bottom:8px}.days button{min-width:45px;padding:9px 5px;border-radius:10px;border:1px solid #3c4840;background:#101612;color:#aeb8b1}.days button.sel{background:#c0ea58;color:#162000}.days button.done{border-color:#7fbd2c}
+label{display:block;color:#9ba69e;font-size:12px;font-weight:900;margin:13px 0 6px}input,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #3b4840;background:#080d0a;color:#fff;outline:none}textarea{min-height:130px;resize:vertical}.primary{width:100%;margin-top:13px;padding:13px;border:0;border-radius:12px;background:#c0ea58;color:#172000;font-weight:1000}
+.challenge{margin:14px 0;padding:15px;border:1px solid #37443b;border-radius:15px;background:#0c1410}.date,.small{font-size:11px;color:#929d95}.ctitle{font-size:22px;font-weight:1000;margin:7px 0}.ctext{white-space:pre-wrap;line-height:1.55;color:#dce4de}.track{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #27312b}.tick{width:43px;height:43px;border-radius:50%;border:1px solid #4b574f;background:#101611;color:#68736c;font-size:20px}.tick.done{background:#c0ea58;color:#172000;border-color:#c0ea58}.note{padding:12px;margin-top:10px;border-radius:12px;background:#0d1511;border:1px solid #354139;white-space:pre-wrap}.empty{text-align:center;color:#89948d;padding:22px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="welcome">WELCOME DEEPSU</div><h1>180 DAY CHALLENGE</h1></header>
+
+<section id="home" class="page active">
+<div class="card"><div class="big">DAY COMPLETED — <span id="completed" class="green">0</span></div><div class="labels"><span>0%</span><span id="percent">0%</span><span>180</span></div><div class="bar"><div id="fill" class="fill"></div></div></div>
+<div class="card"><h2>Today's Challenge</h2><div id="homeChallenge" class="empty">Challenge abhi add nahi kiya.</div></div>
+<div class="card"><div class="stats"><div class="stat"><b id="streak">0</b>STREAK</div><div class="stat"><b id="remaining">180</b>REMAINING</div></div></div>
+</section>
+
+<section id="challengePage" class="page"><div class="card"><h2>DAILY CHALLENGE</h2><div id="days" class="days"></div><div class="challenge"><div id="cdate" class="date"></div><div id="ctitle" class="ctitle">No challenge added</div><div id="ctext" class="ctext">Is day ke liye challenge fill karo.</div></div><label>Challenge Title</label><input id="title" placeholder="Example: PUSH DAY"><label>What do you have to do?</label><textarea id="challengeText" placeholder="Example:
+20 Push-up
+15 Knee Push-up
+20 min walk"></textarea><button id="saveChallenge" class="primary">SAVE CHALLENGE</button></div></section>
+
+<section id="trackPage" class="page"><div class="card"><h2>TRACK</h2><div class="small">Yahan tick karne par hi day complete count hoga.</div><div id="trackList"></div></div></section>
+
+<section id="notesPage" class="page"><div class="card"><h2>NOTES</h2><label>Write anything</label><textarea id="noteText" placeholder="Aaj kya hua, kya improve karna hai..."></textarea><button id="saveNote" class="primary">SAVE NOTE</button><div id="notes"></div></div></section>
+
+<nav><button data-page="home" class="active">🏠<br>HOME</button><button data-page="challengePage">📅<br>CHALLENGE</button><button data-page="trackPage">✓<br>TRACK</button><button data-page="notesPage">📝<br>NOTES</button></nav>
+</div>
+
+<script>
+const KEY="DEEPSU_180_CHALLENGE";
+let data=JSON.parse(localStorage.getItem(KEY)||'{"challenges":{},"done":[],"notes":[]}');
+if(!data.challenges[1]){
+  data.challenges[1]={
+    title:"PUSH DAY",
+    text:"DECLINE - 1 SET JITNA REP NIKALTA HAI\nNORMAL - 1 SET JITNA REP NIKALTA HAI\nINCLINE - 1 SET JITNA REP NIKALTA HAI\nKNEE - 1 SET JITNA REP NIKALTA HAI\n\nYOUTUBE - 1 VIDEO UPLOAD KARNI HAI"
+  };
+  localStorage.setItem(KEY,JSON.stringify(data));
+}
+let selected=Number(localStorage.getItem("DEEPSU_SELECTED_DAY")||"1");
+if(!Number.isInteger(selected) || selected<1 || selected>180) selected=1;
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+const START_DATE=new Date("2026-08-10T00:00:00");
+function dateFor(day){let d=new Date(START_DATE);d.setDate(d.getDate()+day-1);return d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"2-digit"})}
+function streak(){let n=0;for(let i=1;i<=180;i++){if(data.done.includes(i))n++;else break}return n}
+function render(){
+ const n=data.done.length,p=n/180*100;
+ completed.textContent=n;percent.textContent=p.toFixed(1)+"%";fill.style.width=p+"%";remaining.textContent=180-n;streakEl.textContent=streak();
+ renderDays();renderChallenge();renderTrack();renderNotes();
+ const c=data.challenges[selected];
+ homeChallenge.innerHTML=c?`<b>${esc(c.title||"DAILY CHALLENGE")}</b><br><span class="small">${esc(c.text).replaceAll("\n","<br>")}</span>`:"Challenge abhi add nahi kiya.";
+}
+const streakEl=document.getElementById("streak");
+function renderDays(){days.innerHTML="";for(let i=1;i<=180;i++){let b=document.createElement("button");b.textContent=i;if(i===selected)b.classList.add("sel");if(data.done.includes(i))b.classList.add("done");b.onclick=()=>{selected=i;localStorage.setItem("DEEPSU_SELECTED_DAY",String(selected));render()};days.appendChild(b)}}
+function renderChallenge(){let c=data.challenges[selected];cdate.textContent=dateFor(selected)+" • DAY "+selected;ctitle.textContent=c?.title||"No challenge added";ctext.textContent=c?.text||"Is day ke liye challenge fill karo.";title.value=c?.title||"";challengeText.value=c?.text||""}
+function renderTrack(){trackList.innerHTML="";for(let i=1;i<=180;i++){let row=document.createElement("div");row.className="track";let c=data.challenges[i];row.innerHTML=`<div><b>DAY ${i}</b><div class="small">${esc(c?.title||"No challenge added")}</div></div>`;let b=document.createElement("button");b.className="tick "+(data.done.includes(i)?"done":"");b.textContent=data.done.includes(i)?"✓":"○";b.onclick=()=>{if(data.done.includes(i))data.done=data.done.filter(x=>x!==i);else data.done.push(i);save()};row.appendChild(b);trackList.appendChild(row)}}
+function renderNotes(){notes.innerHTML=data.notes.length?data.notes.map(n=>`<div class="note"><b>${esc(n.date)}</b><br>${esc(n.text)}</div>`).join(""):'<div class="empty">No notes yet.</div>'}
+
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(b.dataset.page).classList.add("active")});
+saveChallenge.onclick=()=>{let t=title.value.trim(),x=challengeText.value.trim();if(!t&&!x)return;data.challenges[selected]={title:t,text:x};save()};
+saveNote.onclick=()=>{let x=noteText.value.trim();if(!x)return;data.notes.unshift({date:new Date().toLocaleDateString("en-GB"),text:x});noteText.value="";save()};
+render();
+</script>
+</body>
+</html>
